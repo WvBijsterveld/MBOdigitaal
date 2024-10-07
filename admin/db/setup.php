@@ -3,7 +3,7 @@
 require_once $_SERVER['DOCUMENT_ROOT'] . '/database/dbconnection.php';
 
 // Pad waar de database setup in staat.
-$sqlFile = 'setup.sql';
+$sqlFile = 'mbogodigital.sql';
 
 try {
     // Zorg dat alle foutmeldigen worden weergegeven.
