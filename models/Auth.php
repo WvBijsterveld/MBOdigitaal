@@ -16,65 +16,82 @@ class Auth
     // login controleert de gebruikersnaam (emailadres) en het wachtwoord (secret)
     // die de gebruiker heeft ingevuld in het formulier.
     // login maakt ook een cookie aan. Cookie is 1 uur geldig.
-    // functie retureert true als het goed gaat.
+    // functie retourneert true als het goed gaat.
     public static function login($email, $secret)
     {
         global $db;
 
-        $sql_select_user_by_email = "SELECT * FROM user WHERE email=?";
+        $sql_select_user_by_email = "SELECT * FROM users WHERE email=?";
 
         $stmt = $db->prepare($sql_select_user_by_email);
 
         // Gebruiker wordt opgezocht in de user tabel.
-        // Als de gebruiker bestaat daarna wordt het wachtwoord gecontroleerd.
         if ($stmt->execute([$email])) {
             $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
             $user = $users[0];
 
             if (!$user) {
                 callLoginPage("Er is geen gebruiker gevonden met dit emailadres.");
+                exit();
             }
 
-            // Controleren of het gegeven wachtwoord overeen komt het het opgeslagen
-            // wachtwoord.
-            if (password_verify($secret, $user['secret'])) {
+            // Controleren of het gegeven wachtwoord overeenkomt met het opgeslagen wachtwoord.
+// Corrected login function
+if ($secret === $user['password']) {
+    // Correct password
+    global $jwtkey;
 
-                global $jwtkey;
-                // Aanmaken van de Jason Webtoken (JWT).
-                // Geldigheid van het token is 8 uur.
+    // Get the user's role directly from the `users` table
+    $role = $user["role"];
+    
+    // Generate JWT
+    $token = JWT::encode(
+        array(
+            'iat' => time(),
+            'nbf' => time(),
+            'exp' => time() + 8 * 3600,  // Token valid for 8 hours
+            'data' => array(
+                'id' => $user['id'],
+                'roleName' => $role
+            )
+        ),
+        $jwtkey,
+        'HS256'
+    );
 
-                $role = Role::select($user["roleId"]);
+    // Set the JWT token in cookies
+    setcookie(
+        "token",
+        $token,
+        time() + 8 * 3600,
+        "/",
+        "",
+        true,
+        true
+    );
 
-                $token = JWT::encode(
-                    array(
-                        'iat' => time(),
-                        'nbf' => time(),
-                        'exp' => time() + 8 * 3600,
-                        'data' => array(
-                            'id' => $user['id'],
-                            'roleName' => $role['name']
-                        )
-                    ),
-                    $jwtkey,
-                    'HS256'
-                );
+    // Role-based redirection
+    $roleName = strtolower($role);  // Ensure role is lowercase
+    if ($roleName === 'student') {
+        header("Location: /views/Studentpage.php");
+    } elseif ($roleName === 'mentor') {
+        header("Location: /views/mentorpage.php");
+    } elseif ($roleName === 'levelcoordinator') {
+        header("location: /views/managelevel.php");
+    } else {
+        header("Location: ../views/defaultpagina.php");
+    }
 
-                // JWT wordt opgeslagen in de cookies van de gebruiker.
-                setcookie(
-                    "token",
-                    $token,
-                    time() + 8 * 3600,
-                    "/",
-                    "",
-                    true,
-                    true
-                );
-                return true;
+    exit();  // Stop further script execution
+
+  // Stop further script execution after redirect.
             } else {
-                callLoginPage("U inloggevens zijn niet juist.");
+                callLoginPage("Uw inloggegevens zijn niet juist.");
             }
+            
         } else {
             callErrorPage("Het is niet gelukt om uw gegevens te controleren.");
+            exit();
         }
     }
 
@@ -151,4 +168,3 @@ class Auth
         }
     }
 }
-
