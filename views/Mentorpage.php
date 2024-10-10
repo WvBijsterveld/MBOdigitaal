@@ -50,49 +50,49 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_assessment']))
     <title>Self Assessment Overview</title>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="bg-gray-100 p-6">
-    <div class="max-w-7xl mx-auto">
-        <h1 class="text-3xl font-bold mb-6">Self Assessment Overview</h1>
+<body class="bg-gray-50 min-h-screen flex items-center justify-center p-4">
+    <div class="max-w-6xl w-full p-8 bg-white shadow-lg rounded-lg">
+        <h1 class="text-4xl font-bold text-gray-800 mb-8 text-center">Self Assessment Overview</h1>
 
         <!-- Levels Table -->
-        <div class="bg-white p-4 shadow-md rounded-md">
-            <h2 class="text-xl font-semibold mb-4">Levels Overview</h2>
-            <table class="min-w-full table-auto">
-                <thead class="bg-gray-50">
+        <div class="overflow-x-auto w-full">
+            <h2 class="text-xl font-semibold text-gray-700 mb-6">Levels Overview</h2>
+            <table class="min-w-full table-auto border-collapse bg-white border border-gray-200 rounded-lg shadow-sm">
+                <thead class="bg-gray-100">
                     <tr>
-                        <th class="px-4 py-2 text-left">Level</th>
-                        <th class="px-4 py-2 text-left">Subject</th>
-                        <th class="px-4 py-2 text-left">Description</th>
-                        <th class="px-4 py-2 text-left">Self-Assessment Status</th>
-                        <th class="px-4 py-2 text-left">Teacher Assessment</th>
+                        <th class="px-4 py-3 text-left text-sm font-semibold text-gray-600 uppercase">Level</th>
+                        <th class="px-4 py-3 text-left text-sm font-semibold text-gray-600 uppercase">Subject</th>
+                        <th class="px-4 py-3 text-left text-sm font-semibold text-gray-600 uppercase">Description</th>
+                        <th class="px-4 py-3 text-left text-sm font-semibold text-gray-600 uppercase">Status</th>
+                        <th class="px-4 py-3 text-left text-sm font-semibold text-gray-600 uppercase">Teacher Assessment</th>
                     </tr>
                 </thead>
                 <tbody class="bg-white divide-y divide-gray-200">
                     <?php if (!empty($levels)): ?>
                         <?php foreach ($levels as $level): ?>
-                        <tr>
-                            <td class="px-4 py-2"><?php echo htmlspecialchars($level['level']); ?></td>
-                            <td class="px-4 py-2"><?php echo htmlspecialchars($level['subject']); ?></td>
-                            <td class="px-4 py-2"><?php echo htmlspecialchars($level['description']); ?></td>
-                            <td class="px-4 py-2">
+                        <tr class="hover:bg-gray-50">
+                            <td class="px-4 py-4 text-sm text-gray-700"><?php echo htmlspecialchars($level['level']); ?></td>
+                            <td class="px-4 py-4 text-sm text-gray-700"><?php echo htmlspecialchars($level['subject']); ?></td>
+                            <td class="px-4 py-4 text-sm text-gray-700 max-w-xs break-words"><?php echo htmlspecialchars($level['description']); ?></td>
+                            <td class="px-4 py-4">
                                 <?php if ($level['is_done']): ?>
-                                    <span class="text-green-600">Completed</span>
+                                    <span class="inline-block px-3 py-1 text-xs font-semibold bg-green-100 text-green-800 rounded-full">Completed</span>
                                 <?php else: ?>
-                                    <span class="text-red-600">Not Completed</span>
+                                    <span class="inline-block px-3 py-1 text-xs font-semibold bg-red-100 text-red-800 rounded-full">Not Completed</span>
                                 <?php endif; ?>
                             </td>
-                            <td class="px-4 py-2">
-                             <form method="POST" class="inline">
-                                 <input type="hidden" name="level_id" value="<?php echo $level['level_id']; ?>">
-                                 <input type="text" name="assessment" value="<?php echo htmlspecialchars($level['teacher_assessment'] ?? ''); ?>" placeholder="Assessment" class="border p-1 rounded">
-                                 <button type="submit" name="submit_assessment" class="ml-2 bg-blue-500 text-white rounded px-2">Submit</button>
-                             </form>
+                            <td class="px-4 py-4">
+                                <form method="POST" class="flex items-center space-x-2">
+                                    <input type="hidden" name="level_id" value="<?php echo $level['level_id']; ?>">
+                                    <input type="text" name="assessment" value="<?php echo htmlspecialchars($level['teacher_assessment'] ?? ''); ?>" placeholder="Assessment" class="border border-gray-300 p-2 rounded-md text-sm w-36 sm:w-full focus:ring focus:ring-blue-200">
+                                    <button type="submit" name="submit_assessment" class="bg-blue-500 text-white text-sm px-4 py-2 rounded-md hover:bg-blue-600 whitespace-nowrap">Submit</button>
+                                </form>
                             </td>
                         </tr>
                         <?php endforeach; ?>
                     <?php else: ?>
                         <tr>
-                            <td colspan="5" class="text-center text-gray-500">No levels found</td>
+                            <td colspan="5" class="px-6 py-4 text-center text-gray-500">No levels found</td>
                         </tr>
                     <?php endif; ?>
                 </tbody>
@@ -101,3 +101,4 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_assessment']))
     </div>
 </body>
 </html>
+
